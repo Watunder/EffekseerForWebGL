@@ -1,56 +1,49 @@
 
+# CMake version check
+cmake_minimum_required(VERSION 3.15)
+
 project(effekseer)
 
 option(AS_WASM "compile as wasm" OFF)
 
-# CMake version check
-cmake_minimum_required(VERSION 3.15)
-
 # Set compiler flags
 string(APPEND CMAKE_CXX_FLAGS
   " -O2"
+  " -g1"
+  " -flto"
   " -Wno-inconsistent-missing-override"
-  " --llvm-lto 1"
-  " --memory-init-file 0"
 )
 
 set(CMAKE_CXX_STANDARD 14)
 
 # Set linker flags
-
-if(AS_WASM)
-
-    string(APPEND CMAKE_EXE_LINKER_FLAGS
-      " -s WASM=1"
-      " -s MODULARIZE=1"
-      " -s NO_FILESYSTEM=1"
-      " -s DISABLE_EXCEPTION_CATCHING=1"
-      " -s NO_EXIT_RUNTIME=1"
-      " -s TOTAL_MEMORY=33554432"
-      " -s ALLOW_MEMORY_GROWTH=1"
-      " -s EXPORT_NAME=\"'effekseer_native'\""
-      " -s EXPORTED_FUNCTIONS=\"['_malloc', '_free']\" "
-      " -s EXTRA_EXPORTED_RUNTIME_METHODS=\"['cwrap', 'UTF8ToString']\" "
-      " --post-js ${PROJECT_SOURCE_DIR}/js/post.js"
-    )
-
-else()
-
-    string(APPEND CMAKE_EXE_LINKER_FLAGS
-      " -s WASM=0"
-      " -s MODULARIZE=1"
-      " -s NO_FILESYSTEM=1"
-      " -s DISABLE_EXCEPTION_CATCHING=1"
-      " -s NO_EXIT_RUNTIME=1"
-      " -s TOTAL_MEMORY=33554432"
-      " -s ALLOW_MEMORY_GROWTH=1"
-      " -s EXPORT_NAME=\"'effekseer'\""
-      " -s EXPORTED_FUNCTIONS=\"['_malloc', '_free']\" "
-      " -s EXTRA_EXPORTED_RUNTIME_METHODS=\"['cwrap', 'UTF8ToString']\" "
-      " --post-js ${PROJECT_SOURCE_DIR}/js/post.js"
-    )
-
-endif()
+string(APPEND CMAKE_EXE_LINKER_FLAGS
+  " -s WASM=1"
+  " -s MODULARIZE=1"
+  " -s FILESYSTEM=0"
+  " -s DISABLE_EXCEPTION_CATCHING=1"
+  " -s EXIT_RUNTIME=0"
+  " -s INITIAL_MEMORY=33554432"
+  " -s ALLOW_MEMORY_GROWTH=1"
+  " -s EXPORT_NAME=\"'effekseer_native'\""
+  " -s EXPORTED_FUNCTIONS=\"
+  [
+    '_malloc',
+    '_free'
+  ]\" "
+  " -s EXPORTED_RUNTIME_METHODS=\"
+  [
+    'cwrap',
+    'stackSave',
+    'stackAlloc',
+    'stackRestore',
+    'HEAP8',
+    'HEAPF32',
+    'UTF8ToString',
+    'UTF16ToString'
+  ]\" "
+  " --post-js ${PROJECT_SOURCE_DIR}/js/post.js"
+)
 
 # Assume Effekseer directory
 set(EFFEKSEER_DIR "${PROJECT_SOURCE_DIR}/../Effekseer")
@@ -65,9 +58,9 @@ include_directories(
 )
 
 # Enable OpenGL ES 2.0 mode
-add_definitions(-D__EFFEKSEER_RENDERER_GLES2__)
-add_definitions(-DNDEBUG)
-add_definitions(-D__DISABLED_DEFAULT_TEXTURE_LOADER__)
+add_compile_definitions(-D__EFFEKSEER_RENDERER_GLES2__)
+add_compile_definitions(-DNDEBUG)
+add_compile_definitions(-D__DISABLED_DEFAULT_TEXTURE_LOADER__)
 
 # Set source files
 file(GLOB effekseer_src
