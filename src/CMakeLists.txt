@@ -4,8 +4,6 @@ cmake_minimum_required(VERSION 3.15)
 
 project(effekseer)
 
-option(AS_WASM "compile as wasm" OFF)
-
 # Set compiler flags
 string(APPEND CMAKE_CXX_FLAGS
   " -O2"
@@ -25,7 +23,7 @@ string(APPEND CMAKE_EXE_LINKER_FLAGS
   " -s EXIT_RUNTIME=0"
   " -s INITIAL_MEMORY=33554432"
   " -s ALLOW_MEMORY_GROWTH=1"
-  " -s EXPORT_NAME=\"'effekseer_native'\""
+  " -s EXPORT_NAME=\"'EffekseerInit'\""
   " -s EXPORTED_FUNCTIONS=\"
   [
     '_malloc',
@@ -33,7 +31,7 @@ string(APPEND CMAKE_EXE_LINKER_FLAGS
   ]\" "
   " -s EXPORTED_RUNTIME_METHODS=\"
   [
-    'cwrap',
+    'GL',
     'stackSave',
     'stackAlloc',
     'stackRestore',
@@ -42,7 +40,8 @@ string(APPEND CMAKE_EXE_LINKER_FLAGS
     'UTF8ToString',
     'UTF16ToString'
   ]\" "
-  " --post-js ${PROJECT_SOURCE_DIR}/js/post.js"
+  " --emit-tsd types.d.ts"
+  " --post-js effekseer_webgl.js"
 )
 
 # Assume Effekseer directory
@@ -88,4 +87,4 @@ file(GLOB effekseer_src
 set(CMAKE_EXECUTABLE_SUFFIX ".js")
 
 # Add build settings
-add_executable(effekseer.core ${effekseer_src})
+add_executable(${PROJECT_NAME} ${effekseer_src})
