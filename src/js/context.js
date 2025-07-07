@@ -1,4 +1,5 @@
 import Effekseer from '../Effekseer.js';
+import { _loadBuffer } from './loading.js';
 import { Effect } from './effect.js';
 import { Handle } from './handle.js';
 
@@ -406,7 +407,7 @@ export class Context {
         if (typeof data === 'string') {
             const dirIndex = data.lastIndexOf('/');
             effect.baseDir = (dirIndex >= 0) ? data.slice(0, dirIndex + 1) : '';
-            Effekseer._loadBuffer(data).then(buffer => {
+            _loadBuffer(data).then(buffer => {
                 effect._load(buffer);
             }).catch(reason => {
                 effect.onerror(reason);
@@ -439,7 +440,7 @@ export class Context {
         if (typeof data === 'string') {
             const dirIndex = data.lastIndexOf('/');
             effect.baseDir = (dirIndex >= 0) ? data.slice(0, dirIndex + 1) : '';
-            Effekseer._loadBuffer(data).then(buffer => {
+            _loadBuffer(data).then(buffer => {
                 return effect._loadFromPackage(buffer, jszip);
             }).catch(reason => {
                 effect.onerror(reason);

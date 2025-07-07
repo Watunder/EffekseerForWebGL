@@ -22,16 +22,7 @@
  */
 
 /**
- * @typedef {{
- * _loadBuffer: (path: string) => Promise<ArrayBufferLike>;
- * _drawEffectImage: (image: TheImage) => TheImage;
- * _loadEffectImage: (path: string) => TheImage | null;
- * _loadEffectCustomFile: (path: string, isRequired: boolean) => ArrayBufferLike | null;
- * _loadingEffect: import('./js/effect.js').Effect;
- * _resourcesMap: { [path: string]: ArrayBufferLike };
- * createContext: () => import('./js/context.js').Context;
- * releaseContext: (context: import('./js/context.js').Context) => void;
- * } & import('../build_wasm/types.js').MainModule} EffekseerModule
+ * @typedef {import('../build_wasm/types.js').MainModule} EffekseerModule
  */
 
 /**

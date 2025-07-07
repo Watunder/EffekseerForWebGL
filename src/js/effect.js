@@ -1,4 +1,5 @@
 import Effekseer from '../Effekseer.js';
+import { _resourcesMap, _setLoadingEffect } from './loading.js';
 
 export class Effect {
     /**
@@ -94,7 +95,7 @@ export class Effect {
 
         Promise.all(dependencies.map(async (dependency) => {
             const buffer = await zip.file(dependency).async('arraybuffer');
-            Effekseer._resourcesMap[dependency] = buffer;
+            _resourcesMap[dependency] = buffer;
         }))
 
         const efkBuffer = await zip.file(efkFile).async('arraybuffer');
@@ -105,23 +106,23 @@ export class Effect {
      * @param {ArrayBufferLike} buffer 
      */
     _load(buffer) {
-        Effekseer._loadingEffect = this;
+        _setLoadingEffect(this);
         this.mainBuffer = buffer;
         const memptr = Effekseer._malloc(buffer.byteLength);
         Effekseer.HEAP8.set(new Uint8Array(buffer), memptr);
         this.nativeptr = Effekseer._LoadEffect(this.context.nativeptr, memptr, buffer.byteLength, this.scale);
         Effekseer._free(memptr);
-        Effekseer._loadingEffect = null;
+        _setLoadingEffect(null);
         this._update();
     }
 
     _reload() {
-        Effekseer._loadingEffect = this;
+        _setLoadingEffect(this);
         const memptr = Effekseer._malloc(this.mainBuffer.byteLength);
         Effekseer.HEAP8.set(new Uint8Array(this.mainBuffer), memptr);
         Effekseer._ReloadResources(this.context.nativeptr, this.nativeptr, memptr, this.mainBuffer.byteLength);
         Effekseer._free(memptr);
-        Effekseer._loadingEffect = null;
+        _setLoadingEffect(null);
     }
 
     _update() {

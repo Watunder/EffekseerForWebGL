@@ -1,4 +1,5 @@
 .dts/
+.vscode/
 
 build_wasm/
 

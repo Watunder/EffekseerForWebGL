@@ -1,11 +1,14 @@
-import { Context } from './js/context.js';
-import { Effect } from './js/effect.js';
-import { Handle } from './js/handle.js';
+import { createContext, releaseContext, Context, Effect, Handle } from './js/main.js';
 
 /**
  * @param {{}} [moduleArg] 
- * @returns {Promise<import('./Effekseer.js').EffekseerModule>}
+ * @returns {Promise<{
+ * createContext: typeof createContext;
+ * releaseContext: typeof releaseContext;
+ * Context: typeof Context;
+ * Effect: typeof Effect;
+ * Handle: typeof Handle;
+ * } & import('./Effekseer.js').EffekseerModule>}
  */
 const EffekseerInit = (moduleArg = {}) => { return; }
 export default EffekseerInit;
-export { Context, Effect, Handle };
