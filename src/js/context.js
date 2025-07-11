@@ -111,6 +111,11 @@ export class Context {
      */
     ctx;
 
+    /**
+     * @type {import('../../build_wasm/types.js').NativeService}
+     */
+    native;
+
     _makeContextCurrent() {
         Effekseer.GL.makeContextCurrent(this.ctx);
     }
@@ -190,7 +195,8 @@ export class Context {
         this._restorationOfStatesFlag = true;
 
         this.contextStates.save();
-        this.nativeptr = Effekseer._Init(instanceMaxCount, squareMaxCount, enableExtensionsByDefault, enablePremultipliedAlpha);
+        this.native = new Effekseer.NativeService();
+        this.native.Init(settings.instanceMaxCount, settings.squareMaxCount, settings.enableExtensionsByDefault, settings.enablePremultipliedAlpha);
         this.contextStates.restore();
     }
 
@@ -201,15 +207,15 @@ export class Context {
         if (!deltaFrames) {
             deltaFrames = 1.0;
         }
-        Effekseer._Update(this.nativeptr, deltaFrames);
+        this.native.Update(deltaFrames);
     }
 
     beginUpdate() {
-        Effekseer._BeginUpdate(this.nativeptr);
+        this.native.BeginUpdate();
     }
 
     endUpdate() {
-        Effekseer._EndUpdate(this.nativeptr);
+        this.native.EndUpdate();
     }
 
     /**
@@ -217,7 +223,7 @@ export class Context {
      * @param {number} deltaFrames
      */
     updateHandle(handle, deltaFrames) {
-        Effekseer._UpdateHandle(this.nativeptr, handle.nativeptr, deltaFrames);
+        this.native.UpdateHandle(handle.nativeptr, deltaFrames);
     }
 
     _startQuery() {
@@ -277,7 +283,7 @@ export class Context {
         } else {
             this.contextStates.disableVAO();
         }
-        Effekseer._Draw(this.nativeptr);
+        this.native.Draw();
 
         if (this._restorationOfStatesFlag) {
             this.contextStates.restore();
@@ -295,11 +301,11 @@ export class Context {
             this.contextStates.disableVAO();
         }
 
-        Effekseer._BeginDraw(this.nativeptr);
+        this.native.BeginDraw();
     }
 
     endDraw() {
-        Effekseer._EndDraw(this.nativeptr);
+        this.native.EndDraw();
 
         if (this._restorationOfStatesFlag) {
             this.contextStates.restore();
@@ -310,7 +316,7 @@ export class Context {
      * @param {Handle} handle
      */
     drawHandle(handle) {
-        Effekseer._DrawHandle(this.nativeptr, handle.nativeptr);
+        this.native.DrawHandle(handle.nativeptr);
     }
 
     /**
@@ -321,7 +327,7 @@ export class Context {
         const stack = Effekseer.stackSave();
         const arrmem = Effekseer.stackAlloc(4 * 16);
         Effekseer.HEAPF32.set(matrixArray, arrmem >> 2);
-        Effekseer._SetProjectionMatrix(this.nativeptr, arrmem);
+        this.native.SetProjectionMatrix(arrmem);
         Effekseer.stackRestore(stack);
     }
 
@@ -333,7 +339,7 @@ export class Context {
      * @param {number} aspect Distance of far plane
      */
     setProjectionPerspective(fov, aspect, near, far) {
-        Effekseer._SetProjectionPerspective(this.nativeptr, fov, aspect, near, far);
+        this.native.SetProjectionPerspective(fov, aspect, near, far);
     }
 
     /**
@@ -344,7 +350,7 @@ export class Context {
      * @param {number} far Distance of far plane
      */
     setProjectionOrthographic(width, height, near, far) {
-        Effekseer._SetProjectionOrthographic(this.nativeptr, width, height, near, far);
+        this.native.SetProjectionOrthographic(width, height, near, far);
     }
 
     /**
@@ -355,7 +361,7 @@ export class Context {
         const stack = Effekseer.stackSave();
         const arrmem = Effekseer.stackAlloc(4 * 16);
         Effekseer.HEAPF32.set(matrixArray, arrmem >> 2);
-        Effekseer._SetCameraMatrix(this.nativeptr, arrmem);
+        this.native.SetCameraMatrix(arrmem);
         Effekseer.stackRestore(stack);
     }
 
@@ -372,7 +378,7 @@ export class Context {
      * @param {number} upvecZ Z value of upper vector
      */
     setCameraLookAt(positionX, positionY, positionZ, targetX, targetY, targetZ, upvecX, upvecY, upvecZ) {
-        Effekseer._SetCameraLookAt(this.nativeptr, positionX, positionY, positionZ, targetX, targetY, targetZ, upvecX, upvecY, upvecZ);
+        this.native.SetCameraLookAt(positionX, positionY, positionZ, targetX, targetY, targetZ, upvecX, upvecY, upvecZ);
     }
 
     /**
@@ -382,7 +388,7 @@ export class Context {
      * @param {object=} upvec upper vector
      */
     setCameraLookAtFromVector(position, target, upvec) {
-        Effekseer._SetCameraLookAt(this.nativeptr, position.x, position.y, position.z, target.x, target.y, target.z, upvec.x, upvec.y, upvec.z);
+        this.native.SetCameraLookAt(position.x, position.y, position.z, target.x, target.y, target.z, upvec.x, upvec.y, upvec.z);
     }
 
     /**
@@ -477,7 +483,7 @@ export class Context {
             return;
         }
 
-        Effekseer._ReleaseEffect(this.nativeptr, effect.nativeptr);
+        this.native.ReleaseEffect(effect.nativeptr);
         effect.nativeptr = null;
     }
 
@@ -504,7 +510,7 @@ export class Context {
             z = 0;
         }
 
-        const handle = Effekseer._PlayEffect(this.nativeptr, effect.nativeptr, x, y, z);
+        const handle = this.native.PlayEffect(effect.nativeptr, x, y, z);
         return (handle >= 0) ? new Handle(this, handle) : null;
     }
 
@@ -512,35 +518,35 @@ export class Context {
      * Stop the all effects.
      */
     stopAll() {
-        Effekseer._StopAllEffects(this.nativeptr);
+        this.native.StopAllEffects();
     }
 
     /**
      * Gets the number of remaining allocated instances.
      */
     getRestInstancesCount() {
-        return Effekseer._GetRestInstancesCount(this.nativeptr);
+        return this.native.GetRestInstancesCount();
     }
 
     /**
      * Gets a time when updating
      */
     getUpdateTime() {
-        return Effekseer._GetUpdateTime(this.nativeptr);
+        return this.native.GetUpdateTime();
     }
 
     /**
      * Gets a time when drawing
      */
     getDrawTime() {
-        return Effekseer._GetDrawTime(this.nativeptr);
+        return this.native.GetDrawTime();
     }
 
     /**
      * Get whether VAO is supported
      */
     isVertexArrayObjectSupported() {
-        return Effekseer._IsVertexArrayObjectSupported(this.nativeptr);
+        return this.native.IsVertexArrayObjectSupported();
     }
 
     /**
@@ -552,7 +558,7 @@ export class Context {
      */
     setRestorationOfStatesFlag(flag) {
         this._restorationOfStatesFlag = flag;
-        Effekseer._SetRestorationOfStatesFlag(this.nativeptr, flag);
+        this.native.SetRestorationOfStatesFlag(flag);
     }
 
     /**
@@ -563,13 +569,13 @@ export class Context {
      * @param {number} height captured image's height
      */
     captureBackground(x, y, width, height) {
-        return Effekseer._CaptureBackground(this.nativeptr, x, y, width, height);
+        return this.native.CaptureBackground(x, y, width, height);
     }
 
     /**
      * Reset background
      */
     resetBackground() {
-        return Effekseer._ResetBackground(this.nativeptr);
+        return this.native.ResetBackground();
     }
 }

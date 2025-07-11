@@ -14,14 +14,14 @@ export class Handle {
      * Stop this effect instance.
      */
     stop() {
-        Effekseer._StopEffect(this.context.nativeptr, this.nativeptr);
+        this.context.native.StopEffect(this.nativeptr);
     }
 
     /**
      * Stop the root node of this effect instance.
      */
     stopRoot() {
-        Effekseer._StopRoot(this.context.nativeptr, this.nativeptr);
+        this.context.native.StopRoot(this.nativeptr);
     }
 
     /**
@@ -29,7 +29,7 @@ export class Handle {
      * @property {boolean}
      */
     get exists() {
-        return !!Effekseer._Exists(this.context.nativeptr, this.nativeptr);
+        return this.context.native.Exists(this.nativeptr);
     }
 
     /**
@@ -37,7 +37,7 @@ export class Handle {
      * @param {number} frame Frame of this effect instance.
      */
     setFrame(frame) {
-        Effekseer._SetFrame(this.context.nativeptr, this.nativeptr, frame);
+        this.context.native.SetFrame(this.nativeptr, frame);
     }
 
     /**
@@ -47,7 +47,7 @@ export class Handle {
      * @param {number} z Z value of location
      */
     setLocation(x, y, z) {
-        Effekseer._SetLocation(this.context.nativeptr, this.nativeptr, x, y, z);
+        this.context.native.SetLocation(this.nativeptr, x, y, z);
     }
 
     /**
@@ -57,7 +57,7 @@ export class Handle {
      * @param {number} z Z value of euler angle
      */
     setRotation(x, y, z) {
-        Effekseer._SetRotation(this.context.nativeptr, this.nativeptr, x, y, z);
+        this.context.native.SetRotation(this.nativeptr, x, y, z);
     }
 
     /**
@@ -67,7 +67,7 @@ export class Handle {
      * @param {number} z Z value of scale factor
      */
     setScale(x, y, z) {
-        Effekseer._SetScale(this.context.nativeptr, this.nativeptr, x, y, z);
+        this.context.native.SetScale(this.nativeptr, x, y, z);
     }
 
     /**
@@ -78,7 +78,7 @@ export class Handle {
         const stack = Effekseer.stackSave();
         const arrmem = Effekseer.stackAlloc(4 * 16);
         Effekseer.HEAPF32.set(matrixArray, arrmem >> 2);
-        Effekseer._SetMatrix(this.context.nativeptr, this.nativeptr, arrmem);
+        this.context.native.SetMatrix(this.nativeptr, arrmem);
         Effekseer.stackRestore(stack);
     }
 
@@ -90,7 +90,7 @@ export class Handle {
      * @param {number} a A channel value of color
      */
     setAllColor(r, g, b, a) {
-        Effekseer._SetAllColor(this.context.nativeptr, this.nativeptr, r, g, b, a);
+        this.context.native.SetAllColor(this.nativeptr, r, g, b, a);
     }
 
     /**
@@ -100,7 +100,7 @@ export class Handle {
      * @param {number} z Z value of target location
      */
     setTargetLocation(x, y, z) {
-        Effekseer._SetTargetLocation(this.context.nativeptr, this.nativeptr, x, y, z);
+        this.context.native.SetTargetLocation(this.nativeptr, x, y, z);
     }
 
     /**
@@ -109,7 +109,7 @@ export class Handle {
      * @returns {number} value
      */
     getDynamicInput(index) {
-        return Effekseer._GetDynamicInput(this.context.nativeptr, this.nativeptr, index);
+        return this.context.native.GetDynamicInput(this.nativeptr, index);
     }
 
     /**
@@ -118,7 +118,7 @@ export class Handle {
      * @param {number} value value
      */
     setDynamicInput(index, value) {
-        Effekseer._SetDynamicInput(this.context.nativeptr, this.nativeptr, index, value);
+        this.context.native.SetDynamicInput(this.nativeptr, index, value);
     }
 
     /**
@@ -126,7 +126,7 @@ export class Handle {
      * @param {number} index trigger index
      */
     sendTrigger(index) {
-        Effekseer._SendTrigger(this.context.nativeptr, this.nativeptr, index);
+        this.context.native.SendTrigger(this.nativeptr, index);
     }
 
     /**
@@ -135,7 +135,7 @@ export class Handle {
      * @param {boolean} paused Paused flag
      */
     setPaused(paused) {
-        Effekseer._SetPaused(this.context.nativeptr, this.nativeptr, paused);
+        this.context.native.SetPaused(this.nativeptr, paused);
     }
 
     /**
@@ -144,7 +144,7 @@ export class Handle {
      * @param {boolean} shown Shown flag
      */
     setShown(shown) {
-        Effekseer._SetShown(this.context.nativeptr, this.nativeptr, shown);
+        this.context.native.SetShown(this.nativeptr, shown);
     }
 
     /**
@@ -152,7 +152,7 @@ export class Handle {
      * @param {number} speed Speed ratio
      */
     setSpeed(speed) {
-        Effekseer._SetSpeed(this.context.nativeptr, this.nativeptr, speed);
+        this.context.native.SetSpeed(this.nativeptr, speed);
     }
 
     /**
@@ -160,6 +160,6 @@ export class Handle {
      * @param {number} seed Random seed
      */
     setRandomSeed(seed) {
-        Effekseer._SetRandomSeed(this.context.nativeptr, this.nativeptr, seed);
+        this.context.native.SetRandomSeed(this.nativeptr, seed);
     }
 }

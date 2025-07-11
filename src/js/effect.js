@@ -110,7 +110,7 @@ export class Effect {
         this.mainBuffer = buffer;
         const memptr = Effekseer._malloc(buffer.byteLength);
         Effekseer.HEAP8.set(new Uint8Array(buffer), memptr);
-        this.nativeptr = Effekseer._LoadEffect(this.context.nativeptr, memptr, buffer.byteLength, this.scale);
+        this.nativeptr = this.context.native.LoadEffect(memptr, buffer.byteLength, this.scale);
         Effekseer._free(memptr);
         _setLoadingEffect(null);
         this._update();
@@ -120,7 +120,7 @@ export class Effect {
         _setLoadingEffect(this);
         const memptr = Effekseer._malloc(this.mainBuffer.byteLength);
         Effekseer.HEAP8.set(new Uint8Array(this.mainBuffer), memptr);
-        Effekseer._ReloadResources(this.context.nativeptr, this.nativeptr, memptr, this.mainBuffer.byteLength);
+        this.context.native.ReloadResources(this.nativeptr, memptr, this.mainBuffer.byteLength);
         Effekseer._free(memptr);
         _setLoadingEffect(null);
     }

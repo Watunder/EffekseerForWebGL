@@ -36,10 +36,9 @@ string(APPEND CMAKE_EXE_LINKER_FLAGS
     'stackAlloc',
     'stackRestore',
     'HEAP8',
-    'HEAPF32',
-    'UTF8ToString',
-    'UTF16ToString'
+    'HEAPF32'
   ]\" "
+  " -lembind"
   " --emit-tsd types.d.ts"
   " --post-js effekseer_webgl.js"
 )

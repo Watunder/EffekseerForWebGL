@@ -1,13 +1,13 @@
-
 #pragma once
 
-#include "Effekseer.h"
+#include <Effekseer.h>
+
 #include <algorithm>
 #include <emscripten.h>
 #include <math.h>
 #include <stdlib.h>
 
-namespace EfkWebViewer
+namespace EffekseerForWebGL
 {
 class CustomFileReader : public Effekseer::FileReader
 {
@@ -76,4 +76,4 @@ public:
 
 	Effekseer::FileWriterRef OpenWrite(const EFK_CHAR* path) override { return nullptr; }
 };
-} // namespace EfkWebViewer
+} // namespace EffekseerForWebGL

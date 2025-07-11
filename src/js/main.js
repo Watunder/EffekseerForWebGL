@@ -1,4 +1,3 @@
-import Effekseer from '../Effekseer.js';
 import { Context } from './context.js';
 import { Effect } from './effect.js';
 import { Handle } from './handle.js';
@@ -24,12 +23,12 @@ export const releaseContext = (context) => {
         context._gl = null;
     }
 
-    if (context.nativeptr == null) {
+    if (context.native == null) {
         return;
     }
 
-    Effekseer._Terminate(context.nativeptr);
-    context.nativeptr = null;
+    context.native.Terminate();
+    context.native = null;
 }
 
 export { _loadEffectImage, _loadEffectCustomFile } from './loading.js';
