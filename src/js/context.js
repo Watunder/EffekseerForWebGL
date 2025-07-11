@@ -2,6 +2,7 @@ import Effekseer from '../Effekseer.js';
 import { _loadBuffer } from './loading.js';
 import { Effect } from './effect.js';
 import { Handle } from './handle.js';
+import { getProperty } from './utils.js';
 
 class ContextStates {
     /**
@@ -121,71 +122,65 @@ export class Context {
     }
 
     /**
-     * @param {WebGL2RenderingContext} webglContext
-     * @param {import('../Effekseer.js').EmscriptenWebGLContextAttributes} attributes
-     * @param {{
-     * instanceMaxCount: number,
-     * squareMaxCount: number,
-     * enableExtensionsByDefault: boolean,
-     * enablePremultipliedAlpha: boolean,
-     * enableTimerQuery: boolean,
-     * onTimerQueryReport: (time: number) => void,
-     * timerQueryReportIntervalCount: number
-     * }} settings 
+     * @param {import('../Effekseer.js').EffekseerSettings} obj 
      */
-    init(webglContext, settings, attributes = {
-        alpha: false,
-        depth: false,
-        stencil: false,
-        antialias: false,
-        premultipliedAlpha: false,
-        preserveDrawingBuffer: false,
-        powerPreference: 0,
-        failIfMajorPerformanceCaveat: 0,
-        majorVersion: 1,
-        minorVersion: 0,
-        enableExtensionsByDefault: false,
-        explicitSwapControl: false,
-        proxyContextToMainThread: 0,
-        renderViaOffscreenBackBuffer: false
-    }) {
+    _getEffekseerSettings(obj) {
+        return {
+            instanceMaxCount: getProperty(obj, 'instanceMaxCount', 4000),
+            squareMaxCount: getProperty(obj, 'squareMaxCount', 10000),
+            enableExtensionsByDefault: getProperty(obj, 'enableExtensionsByDefault', true),
+            enablePremultipliedAlpha: getProperty(obj, 'enablePremultipliedAlpha', false)
+        };
+    }
+
+    /**
+     * @param {import('../Effekseer.js').EmscriptenWebGLContextAttributes} obj 
+     */
+    _getEmscriptenWebGLContextAttributes(obj) {
+        return {
+            alpha: getProperty(obj, 'alpha', true),
+            depth: getProperty(obj, 'depth', true),
+            stencil: getProperty(obj, 'stencil', false),
+            antialias: getProperty(obj, 'antialias', true),
+            premultipliedAlpha: getProperty(obj, 'premultipliedAlpha', true),
+            preserveDrawingBuffer: getProperty(obj, 'preserveDrawingBuffer', false),
+            powerPreference: getProperty(obj, 'powerPreference', 0),
+            failIfMajorPerformanceCaveat: getProperty(obj, 'failIfMajorPerformanceCaveat', 0),
+            majorVersion: getProperty(obj, 'majorVersion', 1),
+            minorVersion: getProperty(obj, 'minorVersion', 0),
+            enableExtensionsByDefault: getProperty(obj, 'enableExtensionsByDefault', true),
+            explicitSwapControl: getProperty(obj, 'explicitSwapControl', false),
+            proxyContextToMainThread: getProperty(obj, 'proxyContextToMainThread', 0),
+            renderViaOffscreenBackBuffer: getProperty(obj, 'renderViaOffscreenBackBuffer', false),
+        };
+    }
+
+    /**
+     * @param {WebGL2RenderingContext} webglContext
+     * @param {import('../Effekseer.js').EffekseerSettings} settings
+     * @param {import('../Effekseer.js').EmscriptenWebGLContextAttributes} attributes
+     */
+    init(webglContext, settings, attributes) {
         this._gl = webglContext;
         this.contextStates = new ContextStates(this._gl);
 
-        let instanceMaxCount = 4000;
-        let squareMaxCount = 10000;
-        let enableExtensionsByDefault = true;
-        let enablePremultipliedAlpha = false;
+        settings = this._getEffekseerSettings(settings);
+        attributes = this._getEmscriptenWebGLContextAttributes(attributes);
 
-        if (settings) {
-            if ('instanceMaxCount' in settings) {
-                instanceMaxCount = settings.instanceMaxCount;
-            }
-            if ('squareMaxCount' in settings) {
-                squareMaxCount = settings.squareMaxCount;
-            }
-            if ('enableExtensionsByDefault' in settings) {
-                enableExtensionsByDefault = settings.enableExtensionsByDefault;
-                attributes.enableExtensionsByDefault = enableExtensionsByDefault;
-            }
-            if ('enablePremultipliedAlpha' in settings) {
-                enablePremultipliedAlpha = settings.enablePremultipliedAlpha;
-            }
-            if ('enableTimerQuery' in settings && settings.enableTimerQuery) {
-                globalThis.ext_timer = this._gl.getExtension('EXT_disjoint_timer_query_webgl2');
-                this._availableList = [];
-                this._usingList = [];
-                this._drawCount = 0;
-                this._accumulatedDrawTime = 0;
+        if ('enableTimerQuery' in settings && settings.enableTimerQuery) {
+            globalThis.ext_timer = this._gl.getExtension('EXT_disjoint_timer_query_webgl2');
+            this._availableList = [];
+            this._usingList = [];
+            this._drawCount = 0;
+            this._accumulatedDrawTime = 0;
 
-                if ('onTimerQueryReport' in settings) {
-                    this._onTimerQueryReport = settings.onTimerQueryReport;
-                }
-                if ('timerQueryReportIntervalCount' in settings) {
-                    this._timerQueryReportIntervalCount = settings.timerQueryReportIntervalCount;
-                } else {
-                    this._timerQueryReportIntervalCount = 300;
-                }
+            if ('onTimerQueryReport' in settings) {
+                this._onTimerQueryReport = settings.onTimerQueryReport;
+            }
+            if ('timerQueryReportIntervalCount' in settings) {
+                this._timerQueryReportIntervalCount = settings.timerQueryReportIntervalCount;
+            } else {
+                this._timerQueryReportIntervalCount = 300;
             }
         }
 
